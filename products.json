@@ -1,0 +1,103 @@
+[
+    {
+      "id": "1",
+      "title": "Yerba Mate Taragüi",
+      "description": "Yerba mate clásica Taragüi de 1 kg",
+      "code": "YM001",
+      "price": 1200,
+      "stock": 50,
+      "category": "Bebidas",
+      "thumbnails": ["https://example.com/yerba-mate-taragui.jpg"]
+    },
+    {
+      "id": "2",
+      "title": "Aceite de Girasol Natura",
+      "description": "Aceite de girasol Natura de 900 ml",
+      "code": "AG002",
+      "price": 800,
+      "stock": 30,
+      "category": "Aceites y Condimentos",
+      "thumbnails": ["https://example.com/aceite-natura.jpg"]
+    },
+    {
+      "id": "3",
+      "title": "Arroz Gallo Oro",
+      "description": "Arroz Gallo Oro de 1 kg",
+      "code": "AR003",
+      "price": 500,
+      "stock": 100,
+      "category": "Alimentos Básicos",
+      "thumbnails": ["https://example.com/arroz-gallo-oro.jpg"]
+    },
+    {
+      "id": "4",
+      "title": "Fideos Lucchetti",
+      "description": "Fideos Lucchetti tipo spaguetti de 500 g",
+      "code": "FD004",
+      "price": 300,
+      "stock": 75,
+      "category": "Alimentos Básicos",
+      "thumbnails": ["https://example.com/fideos-lucchetti.jpg"]
+    },
+    {
+      "id": "5",
+      "title": "Azúcar Ledesma",
+      "description": "Azúcar blanca Ledesma de 1 kg",
+      "code": "AZ005",
+      "price": 450,
+      "stock": 60,
+      "category": "Alimentos Básicos",
+      "thumbnails": ["https://example.com/azucar-ledesma.jpg"]
+    },
+    {
+      "id": "6",
+      "title": "Leche La Serenísima",
+      "description": "Leche entera La Serenísima de 1 L",
+      "code": "LE006",
+      "price": 250,
+      "stock": 120,
+      "category": "Lácteos",
+      "thumbnails": ["https://example.com/leche-la-serenisima.jpg"]
+    },
+    {
+      "id": "7",
+      "title": "Coca-Cola",
+      "description": "Gaseosa Coca-Cola de 2.25 L",
+      "code": "CC007",
+      "price": 750,
+      "stock": 90,
+      "category": "Bebidas",
+      "thumbnails": ["https://example.com/coca-cola.jpg"]
+    },
+    {
+      "id": "8",
+      "title": "Pan Lactal Bimbo",
+      "description": "Pan de molde lactal Bimbo de 500 g",
+      "code": "PL008",
+      "price": 600,
+      "stock": 40,
+      "category": "Panadería",
+      "thumbnails": ["https://example.com/pan-bimbo.jpg"]
+    },
+    {
+      "id": "9",
+      "title": "Cerveza Quilmes",
+      "description": "Cerveza Quilmes Cristal de 1 L",
+      "code": "CQ009",
+      "price": 650,
+      "stock": 85,
+      "category": "Bebidas Alcohólicas",
+      "thumbnails": ["https://example.com/cerveza-quilmes.jpg"]
+    },
+    {
+      "id": "10",
+      "title": "Manteca Sancor",
+      "description": "Manteca Sancor de 200 g",
+      "code": "MT010",
+      "price": 350,
+      "stock": 55,
+      "category": "Lácteos",
+      "thumbnails": ["https://example.com/manteca-sancor.jpg"]
+    }
+  ]
+  
