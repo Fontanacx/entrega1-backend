@@ -1,22 +1,21 @@
 import express from 'express';
-import productRoutes from './routes/products.routes.js';
-import cartRoutes from './routes/carts.js';
+import productsRouter from './src/routes/productsRouter.js';
+import cartsRouter from './src/routes/carts.routes.js';
 
 const app = express();
 const PORT = 8080;
 
 app.use(express.json());
 
+// Rutas
+app.use('/api/products', productsRouter);
+app.use('/api/carts', cartsRouter);
+
+// Ruta para la raíz
 app.get('/', (req, res) => {
-  res.send('Bienvenido a la API de Ecommerce. Utiliza /api/products o /api/carts para acceder a los datos.');
+  res.send('<h1>Bienvenido a la API de Ecommerce</h1><p>Usa las rutas <code>/api/products</code> y <code>/api/carts</code> para interactuar con los productos y carritos.</p>');
 });
 
-
-// Configuración de rutas
-app.use('/api/products', productRoutes);
-app.use('/api/carts', cartRoutes);
-
-// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });
