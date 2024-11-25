@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Productos</title>
+  <link rel="stylesheet" href="/css/styles.css">  <!-- Enlazamos el archivo CSS -->
+</head>
+<body>
+  <h1>Lista de Productos</h1>
+
+  {{#if products}} <!-- Si hay productos, los mostramos -->
+    <ul>
+      {{#each products}} <!-- Iteramos sobre los productos -->
+        <li>
+          <div><strong>Nombre:</strong> {{this.title}}</div>
+          <div><strong>Descripción:</strong> {{this.description}}</div>
+          <div><strong>Precio:</strong> ${{this.price}}</div>
+        </li>
+      {{/each}}
+    </ul>
+  {{else}}
+    <p>No se encontraron productos.</p> <!-- Mensaje si no hay productos -->
+  {{/if}}
+
+  <!-- Script adicional si es necesario -->
+</body>
+</html>
