@@ -13,7 +13,7 @@ const io = new Server(httpServer);
 // Configuración de Handlebars
 const hbs = exphbs.create({
   defaultLayout: 'main',  // Usamos el layout principal
-  extname: '.handlebars', // Aseguramos que la extensión sea .handlebars
+  extname: '.handlebars', 
 });
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
@@ -22,7 +22,7 @@ app.set('views', './src/views'); // Aseguramos que las vistas se carguen desde l
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('src/public'));  // Carpeta para archivos estáticos como CSS
+app.use(express.static('src/public')); 
 
 // Rutas
 app.use('/api/products', productRoutes);

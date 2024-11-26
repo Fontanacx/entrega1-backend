@@ -22,4 +22,4 @@ router.post('/', async (req, res) => {
   }
 });
 
-module.exports = router; // Asegúrate de exportar solo el router
+module.exports = router; 
