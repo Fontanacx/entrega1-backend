@@ -1,70 +1,38 @@
-const express = require('express');
-const { Server } = require('socket.io');
-const { createServer } = require('http');
-const exphbs = require('express-handlebars');
-const productRoutes = require('./routes/productRoutes');
-const cartRoutes = require('./routes/cartRoutes');
-const ProductModel = require('./models/ProductModel');
+import express from "express";
+import productsRouter from "./routes/products.router.js";
+import cartsRouter from "./routes/carts.router.js";
+import { config as configHandlebars } from "./config/handlebars.config.js";
+import { config as configWebsocket } from "./config/websocket.config.js";
 
-const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer);
+// VIEWS
+import home from "./routes/home.view.router.js";
+import myCart from "./routes/mycart.view.router.js";
 
-// Configuración de Handlebars
-const hbs = exphbs.create({
-  defaultLayout: 'main',  // Usamos el layout principal
-  extname: '.handlebars', 
-});
-app.engine('handlebars', hbs.engine);
-app.set('view engine', 'handlebars');
-app.set('views', './src/views'); // Aseguramos que las vistas se carguen desde la carpeta correcta
-
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static('src/public')); 
-
-// Rutas
-app.use('/api/products', productRoutes);
-app.use('/api/carts', cartRoutes);
-
-// Página principal
-app.get('/', async (req, res) => {
-  try {
-    const products = await ProductModel.getAll(); // Obtén todos los productos
-    console.log('Productos:', products); // Verifica que los productos se estén obteniendo correctamente
-
-    // Si hay productos, los pasamos a la vista home.handlebars
-    res.render('home', { products: products.length ? products : [] });
-  } catch (error) {
-    console.error('Error al obtener los productos:', error);
-    res.status(500).send('Error al cargar los productos.');
-  }
-});
-
-// Página de productos en tiempo real
-app.get('/live-products', (req, res) => {
-  res.render('liveProducts');
-});
-
-// WebSockets para comunicación en tiempo real
-io.on('connection', async (socket) => {
-  console.log('Nuevo cliente conectado');
-
-  const products = await ProductModel.getAll();
-  socket.emit('productList', products);
-
-  socket.on('addProduct', async (data) => {
-    try {
-      await ProductModel.add(data);
-      const updatedProducts = await ProductModel.getAll();
-      io.emit('productList', updatedProducts);
-    } catch (error) {
-      socket.emit('error', { message: error.message });
-    }
-  });
-});
-
-// Iniciar el servidor
+const APP = express();
 const PORT = 8080;
-httpServer.listen(PORT, () => console.log(`Servidor activo en http://localhost:${PORT}`));
+
+APP.use("/api/public", express.static("./src/public"));
+APP.use(express.urlencoded({ extended: true }));
+APP.use(express.json());
+
+// TEMPLATES ENGINE
+configHandlebars(APP);
+
+// API ROUTES
+APP.use("/api/products", productsRouter);
+APP.use("/api/carts", cartsRouter);
+
+// TEMPLATES ROUTES
+APP.use("/", home);
+APP.use("/my-cart", myCart);
+
+// 404
+APP.use("*", (req, res) => {
+  res.status(404).render("404", { title: "Error 404" });
+});
+
+const httpServer = APP.listen(PORT, () => {
+  console.log(`Ejecutando servidor en: http://localhost:${PORT}`);
+});
+
+configWebsocket(httpServer);

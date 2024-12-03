@@ -1,0 +1,136 @@
+/* General Body */
+body {
+    font-family: "Roboto", sans-serif;
+    background-color: #00f57a;
+    color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-rows: auto 2fr auto;
+  }
+  
+  /* Header */
+  .header-container {
+    background-color: #00f57a;
+    text-align: center;
+    padding: 3rem 0;
+  }
+  
+  
+  .navbar-wrapper ul {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+  }
+  
+  .navbar-wrapper ul li a {
+    font-size: 1.6rem;
+    color: rgb(0, 26, 255);
+    text-decoration: none;
+  }
+  
+  .navbar-wrapper ul li a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Main */
+  .main-wrapper {
+    padding: 3rem 5rem;
+    background-color: #2b2b2b;
+  }
+  
+  /* Product Cards */
+  .products-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+  }
+  
+  .product-card {
+    width: 25rem;
+    height: 35rem;
+    padding: 1.5rem;
+    background-color: rgb(0, 255, 200);
+    border-radius: 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-card figure {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+  }
+  
+  .product-card_image {
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .product-card h2 {
+    font-size: 1.6rem;
+  }
+  
+  .product-card p {
+    font-family: "Open Sans", sans-serif;
+  }
+  
+  .product-card_price {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ff0000;
+  }
+  
+  .product-card_btn {
+    padding: 1rem;
+    background-color: #006400;
+    color: black;
+    text-align: center;
+    border-radius: 1rem;
+    cursor: pointer;
+  }
+  
+  /* Form */
+  .form-container {
+    padding: 2.5rem;
+    background-color: black;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .form-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  input, select, textarea {
+    height: 3rem;
+    border: 0.1rem solid #bbb;
+    border-radius: 0.5rem;
+    padding: 0 1rem;
+  }
+  
+  .form-btn {
+    background-color: #006400;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    border: none;
+  }
+  
+  /* Footer */
+  footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10rem;
+    border-top: 0.1rem solid white;
+  }
+  
