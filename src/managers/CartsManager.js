@@ -3,40 +3,35 @@ import { readJsonFile, writeJsonFile } from "../utils/fileHandler.js";
 import { generateId } from "../utils/collectionHandler.js";
 import ErrorManager from "./ErrorManager.js";
 import ProductsManager from "./ProductsManager.js";
+import mongoose from "mongoose";
 
 const productsManager = new ProductsManager();
 
 class CartsManager {
-  #jsonFileName;
-  #carts;
-  constructor() {
-    this.#jsonFileName = "carts.json";
-  }
-
-  // GET ALL
+  // GET ALL CARTS
   async getCarts(query) {
     const { limit } = query;
     try {
-      this.#carts = await readJsonFile(paths.data, this.#jsonFileName);
+      const carts = await readJsonFile(paths.data, "carts.json");
 
       if (limit > 0) {
-        this.#carts = this.#carts.slice(0, limit);
+        return carts.slice(0, limit);
       }
 
-      return this.#carts;
+      return carts;
     } catch (err) {
       throw new ErrorManager(err.message, err.code);
     }
   }
 
-  // FIND BY ID
-  async $findById(id) {
+  // FIND CART BY ID
+  async findById(id) {
     try {
-      this.#carts = await this.getCarts(0);
-      const cartFound = this.#carts.find((cart) => cart.id === Number(id));
+      const carts = await this.getCarts({});
+      const cartFound = carts.find((cart) => cart.id === Number(id));
 
       if (!cartFound) {
-        throw new ErrorManager("Error finding the cart", 404);
+        throw new ErrorManager("Carrito no encontrado", 404);
       }
       return cartFound;
     } catch (err) {
@@ -44,99 +39,10 @@ class CartsManager {
     }
   }
 
-  // GET BY ID
+  // GET CART BY ID
   async getById(id) {
     try {
-      const cartFound = await this.$findById(id);
-      return cartFound;
-    } catch (err) {
-      throw new ErrorManager(err.message, err.code);
-    }
-  }
-
-  // INSERT NEW CART
-  async insertCart() {
-    try {
-      const cart = {
-        id: generateId(await this.getCarts(0)),
-        products: [],
-      };
-
-      this.#carts.push(cart);
-      await writeJsonFile(paths.data, this.#jsonFileName, this.#carts);
-      return cart;
-    } catch (err) {
-      throw new ErrorManager(err.message, err.code);
-    }
-  }
-
-  // UPDATE
-  async updateCart(id, data) {
-    try {
-      const { products } = data;
-
-      const cartFound = await this.$findById(id);
-
-      const cart = {
-        id: cartFound.id,
-        products: products ? products : cartFound.products,
-      };
-
-      const cartIndex = this.#carts.findIndex(
-        (cart) => cart.id === cartFound.id
-      );
-
-      this.#carts[cartIndex] = cart;
-
-      await writeJsonFile(paths.data, this.#jsonFileName, this.#carts);
-
-      return cart;
-    } catch (err) {
-      throw new ErrorManager(err.message, err.code);
-    }
-  }
-
-  // DELETE
-  async deleteCart(id) {
-    try {
-      const cartFound = await this.$findById(id);
-      const cartIndex = this.#carts.findIndex(
-        (cart) => cart.id === cartFound.id
-      );
-      this.#carts.splice(cartIndex, 1);
-      await writeJsonFile(paths.data, this.#jsonFileName, this.#carts);
-    } catch (err) {
-      throw new ErrorManager(err.message, err.code);
-    }
-  }
-
-  // INSERT PRODUCT TO CART
-  async insertProductToCart(cart, product) {
-    try {
-      if (!cart || !product) {
-        throw new ErrorManager("Missing required data", 400);
-      }
-
-      let productExists = false;
-
-      for (const item of cart.products) {
-        if (item.id === product.id) {
-          item.quantity++;
-          productExists = true;
-          break;
-        }
-      }
-
-      if (!productExists) {
-        const newProduct = {
-          id: product.id,
-          quantity: 1,
-        };
-        cart.products.push(newProduct);
-      }
-      const newCart = await this.updateCart(cart.id, cart);
-
-      return newCart;
+      return await this.findById(id);
     } catch (err) {
       throw new ErrorManager(err.message, err.code);
     }
@@ -145,13 +51,21 @@ class CartsManager {
   // SHOW PRODUCTS IN CART
   async showProductInCart() {
     try {
-      this.#carts = await this.getCarts(0);
-
+      const carts = await this.getCarts({});
       const productInCart = await Promise.all(
-        this.#carts.flatMap((cart) =>
+        carts.flatMap((cart) =>
           cart.products.map(async (product) => {
-            const productData = await productsManager.$findById(product.id);
-            return { ...productData, quantity: product.quantity };
+            if (!mongoose.Types.ObjectId.isValid(product.id)) {
+              throw new ErrorManager(`ID inválido: ${product.id}`, 400);
+            }
+            const productId = new mongoose.Types.ObjectId(product.id);
+            console.log(`Buscando producto con ID: ${productId}`);
+            const productData = await productsManager.getById(productId);
+            if (!productData) {
+              console.log(`Producto con ID ${productId} no encontrado`);
+              throw new ErrorManager(`Producto con ID ${productId} no encontrado`, 404);
+            }
+            return { ...productData.toObject(), quantity: product.quantity };
           })
         )
       );
@@ -162,25 +76,62 @@ class CartsManager {
     }
   }
 
-  // DELETE PRODUCT ON CART
-  async deleteProductToCart(cart, product) {
+  // EMPTY CART
+  async emptyCart() {
     try {
-      if (!cart || !product) {
-        throw new ErrorManager("Missing required data", 400);
-      }
-
-      const newCart = cart;
-
-      for (let i = 0; i < cart.products.length; i++) {
-        if (cart.products[i].id === product) {
-          newCart.products.splice(i, 1);
-          break;
-        }
-      }
-
-      await this.updateCart(cart.id, newCart);
+      const carts = await this.getCarts({});
+      carts.forEach((cart) => {
+        cart.products = [];
+      });
+      await writeJsonFile(paths.data, "carts.json", carts);
     } catch (err) {
-      throw new ErrorManager(err.message, err.code);
+      throw new ErrorManager(err.message, err.code || 500);
+    }
+  }
+
+  // CHECKOUT CART
+  async checkoutCart() {
+    try {
+      const carts = await this.getCarts({});
+      // Simular proceso de compra, aquí puedes añadir lógica específica para el checkout
+      carts.forEach((cart) => {
+        cart.products = [];
+      });
+      await writeJsonFile(paths.data, "carts.json", carts);
+    } catch (err) {
+      throw new ErrorManager(err.message, err.code || 500);
+    }
+  }
+
+  // INSERT PRODUCT TO CART
+  async insertProductToCart(cart, product) {
+    try {
+      const productInCart = cart.products.find(p => p.id === product._id.toString());
+      if (productInCart) {
+        productInCart.quantity += 1;
+      } else {
+        cart.products.push({ id: product._id.toString(), quantity: 1 });
+      }
+      const carts = await this.getCarts({});
+      const updatedCarts = carts.map(c => c.id === cart.id ? cart : c);
+      await writeJsonFile(paths.data, "carts.json", updatedCarts);
+    } catch (err) {
+      throw new ErrorManager(err.message, err.code || 500);
+    }
+  }
+
+  // DELETE PRODUCT FROM CART
+  async deleteProductToCart(cart, productId) {
+    try {
+      const productIndex = cart.products.findIndex(p => p.id === productId);
+      if (productIndex > -1) {
+        cart.products.splice(productIndex, 1);
+      }
+      const carts = await this.getCarts({});
+      const updatedCarts = carts.map(c => c.id === cart.id ? cart : c);
+      await writeJsonFile(paths.data, "carts.json", updatedCarts);
+    } catch (err) {
+      throw new ErrorManager(err.message, err.code || 500);
     }
   }
 }

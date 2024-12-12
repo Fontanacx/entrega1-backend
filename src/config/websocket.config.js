@@ -9,82 +9,111 @@ export const config = (httpServer) => {
   const socketServer = new Server(httpServer);
 
   socketServer.on("connection", async (socket) => {
-    await socketServer.emit("products-list", {
-      products: await productsManager.getProducts(0),
-    });
+    try {
+      await socketServer.emit("products-list", {
+        products: await productsManager.getProducts({}),
+      });
 
-    await socketServer.emit("cart-list", {
-      cart: await cartsManager.showProductInCart(),
-    });
+      await socketServer.emit("cart-list", {
+        cart: await cartsManager.showProductInCart(),
+      });
 
-    await socket.on("new-product", async (data) => {
-      try {
-        await productsManager.insertProduct(data);
+      socket.on("new-product", async (data) => {
+        try {
+          await productsManager.addProduct(data);
 
-        await socketServer.emit("products-list", {
-          products: await productsManager.getProducts(0),
-        });
-      } catch (err) {
-        socketServer.emit("err-message", {
-          message: err.message,
-        });
-      }
-    });
+          await socketServer.emit("products-list", {
+            products: await productsManager.getProducts({}),
+          });
+        } catch (err) {
+          socketServer.emit("err-message", {
+            message: err.message,
+          });
+        }
+      });
 
-    await socket.on("update-product", async (data) => {
-      try {
-        await productsManager.updateProduct(Number(data.id), data.data);
+      socket.on("update-product", async (data) => {
+        try {
+          await productsManager.updateProduct(data.id, data.data);
 
-        await socketServer.emit("products-list", {
-          products: await productsManager.getProducts(0),
-        });
-      } catch (err) {
-        socketServer.emit("err-message", {
-          message: err.message,
-        });
-      }
-    });
+          await socketServer.emit("products-list", {
+            products: await productsManager.getProducts({}),
+          });
+        } catch (err) {
+          socketServer.emit("err-message", {
+            message: err.message,
+          });
+        }
+      });
 
-    await socket.on("delete-product", async (data) => {
-      try {
-        await productsManager.deleteProduct(Number(data.id));
+      socket.on("delete-product", async (data) => {
+        try {
+          await productsManager.deleteProduct(data.id);
 
-        await socketServer.emit("products-list", {
-          products: await productsManager.getProducts(0),
-        });
-      } catch (err) {
-        socketServer.emit("err-message", {
-          message: err.message,
-        });
-      }
-    });
+          await socketServer.emit("products-list", {
+            products: await productsManager.getProducts({}),
+          });
+        } catch (err) {
+          socketServer.emit("err-message", {
+            message: err.message,
+          });
+        }
+      });
 
-    await socket.on("add-product-cart", async (data) => {
-      try {
-        const productFound = await productsManager.getById(data.product);
-        const cartFound = await cartsManager.getById(data.cart);
+      socket.on("add-product-cart", async (data) => {
+        try {
+          const productFound = await productsManager.getById(data.product);
+          const cartFound = await cartsManager.getById(data.cart);
 
-        await cartsManager.insertProductToCart(cartFound, productFound);
-      } catch (err) {
-        socketServer.emit("err-message", {
-          message: err.message,
-        });
-      }
-    });
+          await cartsManager.insertProductToCart(cartFound, productFound);
+          await socketServer.emit("cart-list", {
+            cart: await cartsManager.showProductInCart(),
+          });
+        } catch (err) {
+          socketServer.emit("err-message", {
+            message: err.message,
+          });
+        }
+      });
 
-    await socket.on("delete-product-cart", async (data) => {
-      try {
-        const cartFound = await cartsManager.getById(data.cart);
-        await cartsManager.deleteProductToCart(cartFound, data.product);
+      socket.on("delete-product-cart", async (data) => {
+        try {
+          const cartFound = await cartsManager.getById(data.cart);
+          await cartsManager.deleteProductToCart(cartFound, data.product);
 
-        await socketServer.emit("cart-list", {
-          cart: await cartsManager.showProductInCart(),
-        });
-      } catch (err) {
-        socketServer.emit("err-message", {
-          message: err.message,
-        });
-      }
-    });
+          await socketServer.emit("cart-list", {
+            cart: await cartsManager.showProductInCart(),
+          });
+        } catch (err) {
+          socketServer.emit("err-message", {
+            message: err.message,
+          });
+        }
+      });
+
+      socket.on("empty-cart", async () => {
+        try {
+          await cartsManager.emptyCart();
+          await socketServer.emit("cart-updated", await cartsManager.showProductInCart());
+        } catch (err) {
+          socketServer.emit("err-message", {
+            message: err.message,
+          });
+        }
+      });
+
+      socket.on("checkout-cart", async () => {
+        try {
+          await cartsManager.checkoutCart();
+          await socketServer.emit("cart-updated", await cartsManager.showProductInCart());
+        } catch (err) {
+          socketServer.emit("err-message", {
+            message: err.message,
+          });
+        }
+      });
+    } catch (err) {
+      console.error("Error en la conexión del socket:", err.message);
+    }
   });
 };

@@ -13,6 +13,10 @@ export const config = (APP) => {
           });
         },
       },
+      runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+      },
     })
   );
   APP.set("views", paths.views);

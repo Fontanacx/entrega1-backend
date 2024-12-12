@@ -142,5 +142,41 @@
 		"stock": 30,
 		"thumbnail": "agua.jpg",
 		"status": true
+	},
+	{
+		"id": 13,
+		"name": "Fernet",
+		"code": "FEN_AC_13_11122024-213132",
+		"brand": "Branca",
+		"category": "beverages",
+		"price": 9500,
+		"description": "Fernet Branca 750ml",
+		"stock": 32,
+		"thumbnail": "fernet.webp",
+		"status": true
+	},
+	{
+		"id": 14,
+		"name": "Coca Cola",
+		"code": "FEN_AC_14_11122024-213827",
+		"brand": "la-anonima",
+		"category": "beverages",
+		"price": 2000,
+		"description": "Coca Cola 2.25LTS",
+		"stock": 43,
+		"thumbnail": "coca.webp",
+		"status": true
+	},
+	{
+		"id": 15,
+		"name": "Fideos Luchetti",
+		"code": "FEN_AC_15_11122024-233524",
+		"brand": "luchetti",
+		"category": "Almacen",
+		"price": 960,
+		"description": "Fideos",
+		"stock": 5,
+		"thumbnail": "luchetti.webp",
+		"status": true
 	}
 ]

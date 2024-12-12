@@ -2,7 +2,7 @@
   "name": "ecommerce-backend",
   "version": "1.0.0",
   "main": "server.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
@@ -17,7 +17,10 @@
     "express": "^4.21.1",
     "express-handlebars": "^8.0.1",
     "moment": "^2.30.1",
+    "mongodb": "^6.12.0",
+    "mongoose": "^8.8.4",
     "socket.io": "^4.8.1",
+    "sweetalert2": "^11.14.5",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
