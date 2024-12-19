@@ -1,17 +1,13 @@
-import ErrorManager from "../managers/ErrorManager.js";
-
-const generateId = (collection) => {
-  if (!Array.isArray(collection)) {
-    throw new ErrorManager(`Not valid collection:[{${collection}]`);
-  }
-
-  let maxId = 0;
-  collection.forEach((product) => {
-    if (product.id > maxId) {
-      maxId = product.id;
+export const generateId = (collection) => {
+    console.log(collection);
+    if (!Array.isArray(collection)) {
+        throw new Error("Colección no válida");
     }
-  });
-  return maxId + 1;
+    let maxId = 0;
+    collection.forEach((item) => {
+        if (item.id > maxId) {
+            maxId = item.id;
+        }
+    });
+    return maxId + 1;
 };
-
-export { generateId };

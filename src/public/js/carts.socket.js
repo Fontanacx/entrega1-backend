@@ -3,11 +3,13 @@ const socket = io();
 const cartContainer = document.querySelector(".cart-container");
 
 socket.on("cart-list", (data) => {
-  const cart = Object.values(data).flat() || [];
+  // Asegurarse de que los datos del carrito sean válidos
+  const cart = data.cart || [];  // Asegurarse de que 'cart' no sea undefined o null
 
-  cartContainer.innerHTML = "";
+  cartContainer.innerHTML = ""; // Limpiar el carrito antes de mostrar nuevos productos
 
   if (cart.length > 0) {
+    // Si hay productos en el carrito, mostrarlos
     cart.forEach((product) => {
       const cartProductContainer = document.createElement("article");
       const deleteBtnContainer = document.createElement("div");
@@ -30,7 +32,7 @@ socket.on("cart-list", (data) => {
       productImg.src = `/api/public/images/${product.thumbnail}`;
       productImg.alt = product.name;
       cartProductName.textContent = product.name;
-      cartProductPrice.textContent = product.price;
+      cartProductPrice.textContent = `$${product.price}`;
 
       // STYLES
       cartProductContainer.className = "cart-card";
@@ -45,31 +47,31 @@ socket.on("cart-list", (data) => {
       cartProductName.className = "cart-card_text-name";
       cartProductPrice.className = "cart-card_text-price";
 
-      // EVENT
+      // EVENTO PARA ELIMINAR EL PRODUCTO DEL CARRITO
       deleteBtn.onclick = (e) => {
         e.preventDefault();
         const product = e.target.parentElement.parentElement;
+        const id = product.id;
 
-        const id = Number(product.id);
-
+        // Emitir evento para eliminar el producto del carrito
         socket.emit("delete-product-cart", {
-          cart: 1,
+          cart: 1,  // Asegúrate de enviar el `cartId` correcto si es necesario
           product: id,
         });
 
         Swal.fire({
           toast: true,
           icon: "success",
-          title: "Product deleted",
+          title: "Producto eliminado",
           position: "top-end",
           showConfirmButton: false,
           timer: 3000,
           timerProgressBar: true,
-          with: 600,
+          width: 600,
         });
       };
 
-      // ID
+      // ID del producto
       cartProductContainer.id = product.id;
 
       // LAYOUT
@@ -88,22 +90,24 @@ socket.on("cart-list", (data) => {
       cartContainer.appendChild(cartProductContainer);
     });
   } else {
+    // Si el carrito está vacío, mostrar el mensaje
     const emptyCartContainer = document.createElement("div");
     emptyCartContainer.className = "cart-card_empty-container";
 
-    emptyCartContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#808080" height="100px" width="100px" version="1.1" id="Icons" viewBox="0 0 32 32" xml:space="preserve">
-<path d="M30.8,2.6l-1.4-1.4c-0.3-0.3-0.9-0.4-1.3-0.1l-4.3,2.9c-0.2,0.2-0.4,0.4-0.4,0.7c0,0.3,0.1,0.6,0.3,0.8l0,0l-5.3,5.3  L1.8,15.9c-0.4,0.1-0.7,0.5-0.7,0.9c0,0.4,0.2,0.8,0.6,1l9,3.5l3.5,9c0.1,0.4,0.5,0.6,0.9,0.6c0,0,0,0,0,0c0.4,0,0.8-0.3,0.9-0.7  L21.4,13l-2.5,2.5c-0.4,0.4-1,0.4-1.4,0c-0.2-0.2-0.3-0.5-0.3-0.7l7.9-7.9l0.7,0.7c0,0,0,0,0,0l0.7,0.7c0.2,0.2,0.4,0.3,0.7,0.3  c0,0,0.1,0,0.1,0c0.3,0,0.6-0.2,0.7-0.4l2.9-4.3C31.2,3.5,31.2,3,30.8,2.6z M15.8,20.5c-0.2,0.2-0.5,0.3-0.7,0.3s-0.5-0.1-0.7-0.3  l-2.9-2.9c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l2.9,2.9C16.2,19.5,16.2,20.1,15.8,20.5z"/>
-</svg>`;
+    emptyCartContainer.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" fill="#808080" height="100px" width="100px" version="1.1" id="Icons" viewBox="0 0 32 32" xml:space="preserve">
+        <path d="M30.8,2.6l-1.4-1.4c-0.3-0.3-0.9-0.4-1.3-0.1l-4.3,2.9c-0.2,0.2-0.4,0.4-0.4,0.7c0,0.3,0.1,0.6,0.3,0.8l0,0l-5.3,5.3L1.8,15.9c-0.4,0.1-0.7,0.5-0.7,0.9c0,0.4,0.2,0.8,0.6,1l9,3.5l3.5,9c0.1,0.4,0.5,0.6,0.9,0.6c0,0,0,0,0,0c0.4,0,0.8-0.3,0.9-0.7L21.4,13l-2.5,2.5c-0.4,0.4-1,0.4-1.4,0c-0.2-0.2-0.3-0.5-0.3-0.7l7.9-7.9l0.7,0.7c0,0,0,0,0,0l0.7,0.7c0.2,0.2,0.4,0.3,0.7,0.3c0,0,0.1,0,0.1,0c0.3,0,0.6-0.2,0.7-0.4l2.9-4.3C31.2,3.5,31.2,3,30.8,2.6z M15.8,20.5c-0.2,0.2-0.5,0.3-0.7,0.3s-0.5-0.1-0.7-0.3l-2.9-2.9c-0.4-0.4-0.4-1,0-1.4s1-0.4,1.4,0l2.9,2.9C16.2,19.5,16.2,20.1,15.8,20.5z"/>
+      </svg>`;
 
     const emptyCartTitle = document.createElement("h1");
-    emptyCartTitle.textContent = "No guitars!";
+    emptyCartTitle.textContent = "¡No hay productos en el carrito!";
     emptyCartTitle.className = "cart-card_empty-title";
     emptyCartContainer.append(emptyCartTitle);
     cartContainer.append(emptyCartContainer);
   }
 });
 
-// ERRORS
+// Manejo de errores
 socket.on("err-message", async (data) => {
   await Swal.fire({
     title: `${data.message}`,

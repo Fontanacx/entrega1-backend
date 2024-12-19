@@ -1,160 +1,128 @@
 const socket = io();
 
-document.addEventListener("DOMContentLoaded", () => {
-  const productsCards = document.querySelector(".products-container");
-  const newProductForm = document.querySelector("#formAddProduct");
-  const updateProductForm = document.querySelector("#formUpdateProduct");
-  const deleteProductForm = document.querySelector("#formDeleteProduct");
+const productList = document.querySelector(".container-products");
+const productsForm = document.getElementById("insert-product");
+const errorMessage = document.getElementById("error-message");
+const btnDeleteProduct = document.getElementById("btn-delete-product");
+const inputProductId = document.getElementById("input-product-id");
+let prevPageBtn = document.getElementById("prev-page");
+let nextPageBtn = document.getElementById("next-page");
+let currentPageText = document.getElementById("current-page");
 
-  socket.on("products-list", (data) => {
-    console.log("Productos recibidos del servidor:", data.products);
-    const products = data.products || [];
+socket.on("products-list", (data) => {
+    console.log("Datos recibidos:", data);
+    const products = data.products?.docs ?? [];
+    
+    if (!Array.isArray(products)) {
+        console.error("Los datos no son un arreglo:", products);
+        return;
+    }
 
-    productsCards.innerHTML = "";
+    productList.innerHTML = ''; 
 
     products.forEach((product) => {
-      const productCardContainer = document.createElement("article");
-      const productCardFigure = document.createElement("figure");
-      const productCardImg = document.createElement("img");
-      const productCardTextContainer = document.createElement("div");
-      const productCardTitle = document.createElement("h2");
-      const productCardDescription = document.createElement("p");
-      const productCardPrice = document.createElement("p");
-      const productCardButton = document.createElement("button");
-
-      // CONTENT
-      productCardImg.src = `/api/public/images/${product.thumbnail}`;
-      productCardImg.alt = product.name;
-      productCardTitle.textContent = product.name;
-      productCardPrice.textContent = `$${product.price}`;
-      productCardDescription.textContent = product.description;
-      productCardButton.textContent = "Add to cart";
-
-      // STYLES
-      productCardContainer.className = "product-card";
-      productCardImg.className = "product-card_image";
-      productCardPrice.className = "product-card_price";
-      productCardButton.className = "product-card_btn";
-
-      // product ID
-      productCardContainer.id = product._id;
-
-      // ADD BTN EVENT
-      productCardButton.onclick = (e) => emitAddProduct(e);
-
-      productCardFigure.append(productCardImg);
-      productCardTextContainer.append(
-        productCardTitle,
-        productCardPrice,
-        productCardDescription,
-        productCardButton
-      );
-
-      productCardContainer.append(productCardFigure, productCardTextContainer);
-      productsCards.append(productCardContainer);
+        productList.innerHTML += `
+            <div class="product-card">
+                <ul>
+                    <li>Nombre: ${product.title}</li>
+                    <li>Precio: ${product.price}</li>
+                    <li>Moneda: ${product.currency}</li>
+                    <li>Categoría: ${product.category}</li>
+                    <li>Descripción: ${product.description}</li>
+                    <li>Stock: ${product.stock}</li>
+                    <li>Código: ${product.code}</li>
+                    <li>Estado: ${product.status}</li>
+                    <button class="view-product-btn" data-id="${product._id}">Ver Detalles</button>
+                </ul>
+            </div>
+        `;
     });
-  });
+});
 
-  if (newProductForm) {
-    newProductForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
+prevPageBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        loadProducts(currentPage); 
+    }
+});
 
-      form.reset();
+nextPageBtn.addEventListener("click", () => {
+    currentPage++;
+    loadProducts(currentPage);  
+});
 
-      await socket.emit("new-product", {
-        name: formData.get("name"),
-        brand: formData.get("brand"),
-        category: formData.get("category"),
-        price: formData.get("price"),
+loadProducts(currentPage);
+
+
+
+productsForm.onsubmit = (e) => {
+    e.preventDefault(); 
+    const form = e.target;
+    const formData = new FormData(form);
+
+    const status = formData.get("status") === "on";
+
+    errorMessage.innerText = "";
+    form.reset();
+
+    socket.emit("insert-product", {
+        title: formData.get("title"),    
+        price: formData.get("price"),        
+        currency: formData.get("currency"), 
         description: formData.get("description"),
         stock: formData.get("stock"),
-        thumbnail: "",
-        status: true,
-      });
-
-      await Swal.fire({
-        title: "Product added",
-        icon: "success",
-        width: 600,
-      });
-    };
-  }
-
-  if (updateProductForm) {
-    updateProductForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
-
-      form.reset();
-
-      await socket.emit("update-product", {
-        id: formData.get("id"),
-        data: {
-          name: formData.get("name"),
-          brand: formData.get("brand"),
-          category: formData.get("category"),
-          price: formData.get("price"),
-          description: formData.get("description"),
-          stock: formData.get("stock"),
-          thumbnail: formData.get("thumbnail") || null,
-          status: true,
-        },
-      });
-
-      await Swal.fire({
-        title: `Product ID ${formData.get("id")} updated`,
-        icon: "success",
-        width: 600,
-      });
-    };
-  }
-
-  if (deleteProductForm) {
-    deleteProductForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const formData = new FormData(form);
-
-      form.reset();
-
-      const id = formData.get("id");
-
-      await socket.emit("delete-product", { id: id });
-
-      await Swal.fire({
-        title: `Product ID ${id} deleted`,
-        icon: "success",
-        width: 600,
-      });
-    };
-  }
-
-  async function emitAddProduct(e) {
-    e.preventDefault();
-    const product = e.target.parentElement.parentElement;
-
-    await socket.emit("add-product-cart", { cart: 1, product: product.id });
-
-    await Swal.fire({
-      toast: true,
-      icon: "success",
-      title: "Product added to cart",
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
+        code: formData.get("code"),
+        status: status,
+        category: formData.get("category")
     });
-  }
+};
 
-  // ERRORS
-  socket.on("err-message", async (data) => {
-    await Swal.fire({
-      title: `${data.message}`,
-      icon: "error",
-      width: 600,
-    });
-  });
+
+
+btnDeleteProduct.onclick = () => {
+    const id = Number(inputProductId.value);
+    inputProductId.value = "";
+    errorMessage.innerText = "";
+
+    if (id > 0) {
+        socket.emit("delete-product", { id });
+    }
+};
+
+socket.on("error-message", (data) => {
+    errorMessage.innerText = data.message;
+    console.log(data.message);
 });
+
+function showProductModal(product) {
+    const modalContent = `
+        <div class="modal">
+            <h2>${product.title}</h2>
+            <p>Precio: ${product.price}</p>
+            <p>Moneda: ${product.currency}</p>
+            <p>Categoria: ${product.category}</p>
+            <p>Descripcion: ${product.description}</p>
+            <p>Stock: ${product.stock}</p>
+            <p>Codigo: ${product.code}</p>
+            <p>Estado: ${product.status}</p>
+            <button id="close-modal">Cerrar</button>
+        </div>
+    `;
+    document.body.innerHTML += modalContent;
+    document.getElementById("close-modal").onclick = () => {
+        document.querySelector(".modal").remove();
+    };
+}
+
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("view-product-btn")) {
+        const productId = e.target.getAttribute("data-id");
+        const product = products.find(p => p._id === productId);
+        if (product) {
+            showProductModal(product); 
+        }
+    }
+});
+
+
+

@@ -1,6 +1,5 @@
-const convertToBool = (value) => {
-    const trueValues = ["verdadero", "true", "on", "yes", "1", 1, true];
-    return trueValues.includes(value);
-  };
+export const convertToBoolean = (value) => {
   
-  export { convertToBool }
+    const trueValues = [ "true", "on", "yes", "1", 1, true ];
+    return trueValues.includes(value);
+};

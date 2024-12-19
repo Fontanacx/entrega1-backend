@@ -1,4 +1,79 @@
-<div class="cart-container">
-</div>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/api/public/js/carts.socket.js"></script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="/api/public/css/index.css">
+</head>
+<body class="cart-body">
+  <div class="cart-container">
+    <h1 class="cart-title">{{title}}</h1>
+
+    {{#if error}}
+      <div class="error-message">
+        <p>Error: {{error}}</p>
+      </div>
+    {{/if}}
+
+    {{#if products.length}}
+      <div class="cart-products">
+        {{#each products}}
+          <div class="cart-product">
+            <img src="/api/public/images/{{thumbnail}}" alt="{{name}}" class="cart-product-img" />
+            <div class="cart-product-details">
+              <h3 class="cart-product-title">{{name}}</h3>
+              <p class="cart-product-price">Precio: ${{price}}</p>
+              <p class="cart-product-quantity">Cantidad: {{quantity}}</p>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <p class="empty-cart-message">El carrito está vacío.</p>
+    {{/if}}
+
+    <div class="cart-actions">
+      <button id="emptyCartBtn" class="cart-btn danger">Vaciar Carrito</button>
+      <button id="checkoutBtn" class="cart-btn">Finalizar Compra</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/api/public/js/cart.js"></script>
+  <script>
+    // Conexión al servidor WebSocket
+const socket = io();
+
+// Escuchar el evento "cart-list" que emite el servidor cuando se actualiza el carrito
+socket.on("cart-list", (data) => {
+  console.log("Datos del carrito recibidos:", data.cart);  // Verificar los datos del carrito
+
+  const cartContainer = document.querySelector(".cart-container");
+  cartContainer.innerHTML = "";  // Limpiar el carrito
+
+  if (data.cart && data.cart.length > 0) {
+    // Mostrar los productos en el carrito
+    data.cart.forEach(product => {
+      console.log("Producto en el carrito:", product);  // Verificar cada producto
+
+      const productDiv = document.createElement("div");
+      productDiv.classList.add("cart-product");
+      productDiv.innerHTML = `
+        <h3>${product.name}</h3>
+        <p>Precio: $${product.price}</p>
+        <p>Cantidad: ${product.quantity}</p>
+        <img src="/api/public/images/${product.thumbnail}" alt="${product.name}">
+      `;
+      cartContainer.appendChild(productDiv);
+    });
+  } else {
+    // Si el carrito está vacío
+    cartContainer.innerHTML = "<p>El carrito está vacío.</p>";
+  }
+});
+
+  </script>
+</body>
+</html>

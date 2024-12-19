@@ -1,0 +1,201 @@
+:root {
+    --primary-color: #3d0dc1;
+    --secondary-color: #007bff;
+    --success-color: #00c853;
+    --danger-color: #d32f2f;
+    --background-color: #f8f9ff;
+    --white: #ffffff;
+    --gray-100: #f4f4f4;
+    --gray-200: #e0e0e0;
+    --gray-300: #999;
+    --text-primary: #333;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-special: 10px 3px 10px 3px;
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+  
+  /* Control de imágenes */
+  img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  
+  .product-image {
+    width: 100%;
+    height: 200px; /* Altura fija para todas las imágenes */
+    object-fit: cover; /* Mantiene la proporción y cubre el espacio */
+    border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+  }
+  
+  /* Títulos y contenedores principales */
+  .ecommerce-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    text-align: center;
+    margin: 2rem 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .container-titles {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .container-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 0 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* Tarjetas de productos */
+  .products {
+    background-color: var(--white);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-width: 300px; /* Ancho máximo para las tarjetas */
+    margin: 0 auto;
+  }
+  
+  .products:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .products ul {
+    list-style: none;
+    padding: 1rem;
+  }
+  
+  .products ul li {
+    margin: 0.5rem 0;
+  }
+  
+  /* Botones y enlaces */
+  .product-link, .add-to-cart {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1rem;
+    border-radius: var(--border-radius-special);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    margin: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .product-link {
+    background-color: var(--secondary-color);
+    color: var(--white);
+    min-width: 80px;
+  }
+  
+  .add-to-cart {
+    background-color: var(--success-color);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    min-width: 120px;
+  }
+  
+  /* Vista de carrito */
+  .view-cart {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: var(--white);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .product-item {
+    background-color: var(--gray-100);
+    padding: 1rem;
+    margin: 0.8rem 0;
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .product-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--border-radius-sm);
+    margin-right: 1rem;
+  }
+  
+  /* Formularios y otros elementos permanecen igual */
+  /* ... resto del CSS sin cambios ... */
+  
+  /* Ajustes adicionales para imágenes en diferentes contextos */
+  .detail-product img {
+    max-width: 300px;
+    height: auto;
+    border-radius: var(--border-radius-sm);
+  }
+  
+  .error404 img {
+    max-width: 300px;
+    height: auto;
+    margin: 2rem 0;
+  }
+  
+  /* Media queries para responsividad */
+  @media (max-width: 768px) {
+    .container-products {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .products {
+      max-width: 250px;
+    }
+    
+    .product-image {
+      height: 150px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .container-products {
+      grid-template-columns: 1fr;
+    }
+    
+    .products {
+      max-width: 100%;
+    }
+    
+    .product-image {
+      height: 180px;
+    }
+  }
